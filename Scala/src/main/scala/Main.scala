@@ -19,7 +19,7 @@ object MainApp extends Solutions with App {
   // println(Await.result(betterApplicativeSolution(), Duration(10, SECONDS)))
   // println(Await.result(superSayanApplicativeSolution(), Duration(10, SECONDS)))
   // println(Await.result(composedApplicativeSolution(), Duration(10, SECONDS)))
-  // println(Await.result(nApplicativeSolution(), Duration(10, SECONDS)))
+  println(Await.result(nApplicativeSolution(), Duration(10, SECONDS)))
   println(Await.result(nApplicativeModifiedSolution(), Duration(10, SECONDS)))
 }
 
@@ -62,6 +62,7 @@ trait Solutions {
   }
 
   // what if we have complicated nested Applicatives structures? They compose! (they are functors afterall...)
+  // maybe you don't even need monad transformers!!
   def composedApplicativeSolution(): Future[Option[Int]] = {
     lazy val emaDollars = Future(Option(42))
     lazy val zanzaDollars = Future(Option(10))
@@ -77,7 +78,7 @@ trait Solutions {
     lazy val gioDollars = Future(1)
 
     sequence(List(emaDollars, zanzaDollars, fedeDollars, gioDollars))
-      .map(_.foldLeft(0)(_ + _))
+      .map(_.reduceLeft(computeTotalDollarsUncurried))
   }
 
   // what if we don't know how many Applicative values we are going to have AND we want to add a 10 dollar tip before adding them?
@@ -87,6 +88,6 @@ trait Solutions {
 
     traverse(List(emaDollars, zanzaDollars, fedeDollars, gioDollars))(
       d => d.map(_ + 10)
-    ).map(_.foldLeft(0)(_ + _))
+    ).map(_.reduceLeft(computeTotalDollarsUncurried))
   }
 }
